@@ -125,5 +125,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-!/logs/history/
-!/robot/data/
+/logs/history/
+/robot/data/
