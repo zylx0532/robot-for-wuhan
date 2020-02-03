@@ -127,3 +127,4 @@ dmypy.json
 
 /logs/history/
 /robot/data/
+/advanced/md_local2online/settings.py

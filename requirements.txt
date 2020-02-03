@@ -5,6 +5,7 @@ idna==2.8
 itchat==1.2.32
 pypng==0.0.20
 PyQRCode==1.2.1
+qiniu==7.2.4
 requests==2.22.0
 urllib3==1.25.8
 wxpy==0.3.9.8
