@@ -29,7 +29,7 @@ def start_servers(self):
 	self.DISABLE_COMMAND_PREFIX = "关闭"
 
 
-	@self.register(chats=self.target_groups + [self.my_fh], msg_types=[TEXT], except_self=False)
+	@self.register(chats=self.target_groups + [self.my_fh], msg_types=[TEXT, SHARING], except_self=False)
 	def func_control(msg: Message):
 		if msg.text == "帮助":
 			return ABOUT_ME.format(

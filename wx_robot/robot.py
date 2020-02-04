@@ -49,8 +49,10 @@ class MyBot(Bot):
 				self.my_log.error("No group found with key {}".format(search_key))
 			else:
 				self.target_groups.append(searched_group)
-				searched_group.send("大家好，我是武汉疫情机器人，特为您提供[查XX]命令查询地区疫情，如需帮助请回复帮助，新年快乐~")
 				self.my_log.info("Successfully added group {} with key {}".format(searched_group.name, search_key))
+
+				if SEND_GREETING:
+					searched_group.send("大家好，我是武汉疫情机器人，特为您提供[查XX]命令查询地区疫情，如需帮助请回复帮助，新年快乐~")
 
 
 	def log_out_callback(self):

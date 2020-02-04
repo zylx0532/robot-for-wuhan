@@ -10,7 +10,7 @@ import logging
 """
 修改以下代码，尤其是要监控的群组
 """
-SEND_GREETING           = True
+SEND_GREETING           = False
 ENABLE_VERIFY_NEWS      = True          # 辟谣开关
 ENABLE_CHECK_TRANSPORT  = True          # TODO 出行人开关
 ENABLE_CHECK_DISEASE    = True          # TODO 疫情数据开关
