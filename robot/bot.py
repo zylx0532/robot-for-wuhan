@@ -76,7 +76,7 @@ class MyBot(Bot):
 		embed()
 	#
 	def log_out_callback(self):
-		self.my_log.info("Exited ~")
+		self.my_log.info("注意：您的机器人已下线！")
 
 
 if __name__ == '__main__':
