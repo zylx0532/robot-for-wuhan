@@ -23,15 +23,9 @@ VERIFY_NEWS_URL = 'https://vp.fact.qq.com/searchresult'
 
 
 def _search_fact(title: str):
-	res = requests.get(url=VERIFY_NEWS_URL, params={"title": title, "num": 0}, headers=VERIFY_NEWS_HEADERS)
-	if res.status_code != 200:
-		return {
-			"code": -1,
-			"title": title,
-			"reason": "状态码出错：{}".format(res.status_code)
-		}
+	# api调用状态码肯定200，直接看code码即可
+	res_json = requests.get(url=VERIFY_NEWS_URL, params={"title": title, "num": 0}, headers=VERIFY_NEWS_HEADERS).json()
 
-	res_json = res.json()
 	if res_json["code"] != 0:
 		return {
 			"code": -2,

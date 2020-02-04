@@ -125,6 +125,8 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+.idea/
+
 /logs/history/
 /robot/data/
-/advanced/md_local2online/settings.py
+/md_local2online/settings.py
