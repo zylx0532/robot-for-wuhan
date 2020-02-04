@@ -36,13 +36,13 @@ def _search_fact(title: str):
 		return {
 			"code": -3,
 			"title": title,
-			"reason": "没有返回结果"
+			"reason": "搜索显示没有结果，请考虑使用更简单的关键词"
 		}
 	if res_json["total"] > THRESHOLD_CONTENT_CNT:
 		return {
 			"code": -4,
 			"title": title,
-			"reason": "返回结果过多，共有{}条".format(res_json["total"])
+			"reason": "搜索显示结果过多，共有{}条".format(res_json["total"])
 		}
 
 	# 返回第一条（最相关）消息

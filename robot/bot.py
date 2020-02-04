@@ -19,7 +19,12 @@ import re
 class MyBot(Bot):
 
 	def __init__(self, *args, **kwargs):
-		super().__init__(cache_path=WX_COOKIE_PATH, qr_path=WX_QR_PATH)
+		super().__init__(
+			cache_path=WX_COOKIE_PATH,
+			qr_path=WX_QR_PATH,
+			logout_callback=self.log_out_callback
+		)
+		# 添加PUID路径，用于追溯用户ID的唯一标识
 		self.enable_puid(WX_PUID_PATH)
 		self.my_log = get_wechat_logger(receiver=self, level=WX_LOG_LEVEL, name="WXPY")
 		self.my_log.info("Initialized ~")
@@ -70,9 +75,8 @@ class MyBot(Bot):
 	def run(self):
 		embed()
 	#
-	def __del__(self):
+	def log_out_callback(self):
 		self.my_log.info("Exited ~")
-		self.logout()
 
 
 if __name__ == '__main__':
