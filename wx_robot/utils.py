@@ -4,24 +4,19 @@
 # @Author       : Mark Shawn
 # @Email        : shawninjuly@gmai.com
 # ------------------------------------
-from advanced.CONST import *
-from servers.verify_news import verify_news
+from .CONST import *
+
+# 通过链接wx_servers库来提供wx_robots的服务
+from wx_servers.verify_news import verify_news
+from wx_servers.check_disease import search_area_partial
 
 import os
 import time
 from datetime import datetime
 
-from wxpy import Message, SHARING
+from wx_robot import *
 
-"""
-微信配置
-"""
-WX_COOKIE_PATH      = os.path.join(WX_PATH, "cookie.pkl")
-WX_PUID_PATH        = os.path.join(WX_PATH, "puid.pkl")
-WX_QR_PATH          = os.path.join(WX_PATH, "QR.png")
 
-WX_COOKIE_TIMEOUT   = 30 * 60 * 60    # 微信Cookie文件的过期时间，设置成30小时
-WX_MSG_VERIFY_TIMEOUT = 60            # 微信辟谣的时间延迟，超过一分钟就不辟谣了
 
 
 def clear_cookie() -> None:
@@ -34,13 +29,13 @@ def clear_cookie() -> None:
 		if os.stat(WX_COOKIE_PATH).st_mtime < time.time() - WX_COOKIE_TIMEOUT:
 			os.remove(WX_COOKIE_PATH)
 
-def real_sender(msg: Message):
-	return msg.member if msg.member else msg.sender
+def real_sender(msg: Message) -> str:
+	return msg.member.name if msg.member else msg.sender.name
 
 def pre_verify_news(msg: Message):
 	msg_dict = {
 		"id": msg.id,
-		"sender": real_sender(msg).name,
+		"sender": real_sender(msg),
 		"text": msg.text,
 	}
 	if (datetime.now() - msg.create_time).seconds > WX_MSG_VERIFY_TIMEOUT:
@@ -69,10 +64,11 @@ def handle_msg(msg: Message):
 		verified_status, verified_res = verify_news(msg.text)
 		if verified_status:
 			if msg.member:
-				return True, "@{} {}".format(real_sender(msg).name, verified_res)
+				return True, "@{} {}".format(real_sender(msg), verified_res)
 			else:
 				return True, verified_res
 		else:
 			msg_dict["reason"] = verified_res
 
 	return False, msg_dict
+

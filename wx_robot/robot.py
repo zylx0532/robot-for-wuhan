@@ -4,16 +4,10 @@
 # @Author       : Mark Shawn
 # @Email        : shawninjuly@gmai.com
 # ------------------------------------
-from robot.utils import *
+from wx_robot.utils import *
+from wx_robot.connect_servers import start_servers
 
 from wxpy import *
-
-assert ENABLE_VERIFY_NEWS in [True, False]
-assert ENABLE_CHECK_TRANSPORT in [True, False]
-assert ENABLE_CHECK_DISEASE in [True, False]
-
-import re
-
 
 
 class MyBot(Bot):
@@ -24,64 +18,49 @@ class MyBot(Bot):
 			qr_path=WX_QR_PATH,
 			logout_callback=self.log_out_callback
 		)
+
 		# 添加PUID路径，用于追溯用户ID的唯一标识
 		self.enable_puid(WX_PUID_PATH)
-		self.my_log = get_wechat_logger(receiver=self, level=WX_LOG_LEVEL, name="WXPY")
-		self.my_log.info("Initialized ~")
 
-		self.my_fh = self.file_helper
-		self.target_groups = []
+		# 将log发送给自己的文件助手
+		self.my_log = get_wechat_logger(receiver=self, level=WX_LOG_LEVEL, name="WXPY")
+		self.my_fh = self.file_helper       # 自己的文件传输助手
+		self.target_groups = []             # 要监控的群组
+
+		self.verified_msgs_dict = dict()    # TODO 设置一个固定长的字典队列
+
+		self.start_servers          = start_servers
+		self.enable_verify_news     = ENABLE_VERIFY_NEWS        # 辟谣
+		self.enable_check_disease   = ENABLE_CHECK_DISEASE      # 疫情数据
+		self.enable_check_transport = ENABLE_CHECK_TRANSPORT    # 出行人数据
+
+	def run(self):
+		self.my_log.info("Welcome to use Robot-For-Wuhan ~")
+		self.load_groups_to_monitor()
+		self.start_servers(self)
+		embed()
+
+
+	def load_groups_to_monitor(self):
 		for search_key in WX_VERIFY_GROUP_KEYS:
 			try:
-				searched_group = ensure_one(self.groups().search(search_key))
+				searched_group = ensure_one(self.groups().search(search_key))   # type: Group
 			except:
 				self.my_log.error("No group found with key {}".format(search_key))
 			else:
 				self.target_groups.append(searched_group)
+				searched_group.send("大家好，我是武汉疫情机器人，特为您提供[查XX]命令查询地区疫情，如需帮助请回复帮助，新年快乐~")
 				self.my_log.info("Successfully added group {} with key {}".format(searched_group.name, search_key))
-		self.my_log.info("Loading finished ~")
-
-		# TODO 设置一个固定长的字典队列
-		self.msgs_dict = dict()
-
-		if ENABLE_VERIFY_NEWS:
-			# TODO 以下逻辑还没有完全和 utils中解耦，后续再优化
-			@self.register(chats=self.target_groups, msg_types=[SHARING], except_self=False)
-			def msg_verify(msg: Message):
-				msg_status, msg_info = handle_msg(msg)
-				if msg_status:
-					self.my_log.info(msg_info)
-					return msg_info
-				else:
-					self.msgs_dict.update({msg_info["id"]: msg_info})
-					if WX_VERIFY_DEBUG:
-						return msg_info
-
-			@self.register(chats=Groups, msg_types=[TEXT], except_self=False)
-			def msg_question(msg: Message):
-				# TODO 不清楚 msg.is_at 是否可以来自他人@他人
-				if msg.is_at and "追" in msg.text:
-					msg_id = re.search("追\s*(\d+)", msg.text).group(1)
-					msg_info = self.msgs_dict.get(msg_id, None)
-					return "@{} 答: {}".format(real_sender(msg).name, msg_info)
 
 
-		if ENABLE_CHECK_TRANSPORT:
-			pass
-
-		if ENABLE_CHECK_DISEASE:
-			pass
-
-	def run(self):
-		embed()
-	#
 	def log_out_callback(self):
 		self.my_log.info("注意：您的机器人已下线！")
 
 
 if __name__ == '__main__':
-	mb = MyBot()
-	mb.run()
+	my_bot = MyBot()
+	my_bot.run()
+
 
 
 # wxpy.Bot()对象的参数

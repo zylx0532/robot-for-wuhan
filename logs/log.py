@@ -16,7 +16,7 @@ logger.setLevel(logging.DEBUG)
 
 # create file handler
 FILE_NAME = "{}.log".format(datetime.now().strftime("%y%m%d_%H%M%S"))
-LOG_DIR = os.path.join(PROJECT_PATH, "logs/history")
+LOG_DIR = os.path.join(PROJECT_DIR, "logs/history")
 LOG_PATH = os.path.join(LOG_DIR, FILE_NAME)
 LOG_HANDLE = logging.FileHandler(filename=LOG_PATH)
 LOG_HANDLE.setLevel(logging.INFO)

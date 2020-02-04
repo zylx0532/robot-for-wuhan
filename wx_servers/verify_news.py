@@ -5,21 +5,11 @@
 # @Email		: shawninjuly@gmai.com
 # ------------------------------------
 from logs.log import logger
+from wx_servers.CONST import *
 
 import requests
 import json
-THRESHOLD_CONTENT_CNT = 10      # 如果返回过多，就说明关键词太模糊，这种情况下不辟谣
-CUT_ABSTRACT_LEN = 50
 
-VERIFY_NEWS_HEADERS = {
-		'host': 'vp.fact.qq.com',
-		'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
-		'sec-fetch-mode': 'no-cors',
-		'sec-fetch-site': 'same-origin',
-		'referer': 'https://vp.fact.qq.com/home?state=2'
-	}
-
-VERIFY_NEWS_URL = 'https://vp.fact.qq.com/searchresult'
 
 
 def _search_fact(title: str):

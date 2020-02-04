@@ -8,6 +8,7 @@
 
 if __name__ == '__main__':
 
-	from robot.bot import MyBot
+	from wx_robot.robot import MyBot
 
-	MyBot().run()
+	my_bot = MyBot()
+	my_bot.run()
