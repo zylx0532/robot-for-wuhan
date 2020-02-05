@@ -128,5 +128,5 @@ dmypy.json
 .idea/
 
 /logs/history/
-/robot/data/
+/wx_robot/data/
 /md_local2online/settings.py

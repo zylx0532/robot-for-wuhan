@@ -6,10 +6,10 @@
 # ------------------------------------
 from settings_base import *
 
+
 """
 微信配置
 """
-
 # 该文件夹内的数据是您自己的用户数据，不会上传到Github，但需要确保文件夹存在
 WX_ROBOT_DATA_DIR         = os.path.join(WX_ROBOT_DIR, "data")
 if not os.path.exists(WX_ROBOT_DATA_DIR):

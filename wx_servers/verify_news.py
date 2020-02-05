@@ -4,11 +4,52 @@
 # @Author	   : Mark Shawn
 # @Email		: shawninjuly@gmai.com
 # ------------------------------------
+from wx_robot.utils import *
 from logs.log import logger
 from wx_servers.CONST import *
 
 import requests
 import json
+
+def pre_verify_news(msg: Message):
+	msg_dict = {
+		"id": msg.id,
+		"sender": real_sender(msg).name,
+		"text": msg.text,
+	}
+	if (datetime.now() - msg.create_time).seconds > WX_MSG_VERIFY_TIMEOUT:
+		msg_dict.update({
+			"code": -1,
+			"reason": "超过预设时间，本AI不打算给你辟谣了！"
+		})
+
+	elif msg.type == "Sharing":
+		msg_dict.update({
+			"code": 0,
+			"reason": "SUCCESS ~"
+		})
+	else:
+		msg_dict.update({
+			"code": -2,
+			"reason": "暂不支持此类消息类型的辟谣！",
+		})
+	return msg_dict
+
+
+def handle_msg(msg: Message):
+	msg_dict = pre_verify_news(msg)
+	if msg_dict["code"] == 0:
+		verified_status, verified_res = verify_news(msg.text)
+		if verified_status:
+			if msg.member:
+				return True, "@{} {}".format(real_sender(msg).name, verified_res)
+			else:
+				return True, verified_res
+		else:
+			msg_dict["reason"] = verified_res
+
+	return False, msg_dict
+
 
 
 
@@ -75,11 +116,16 @@ def verify_news(title):
 
 	res_verify_news = _search_fact(title)
 	if res_verify_news["code"] == 0:
-		data_dict = json.loads(res_verify_news["reason"])["_source"]
-		reply_text = '注意：这个『{}』可能是『{}』，这里有详细的报道：{}\n更多可以了解：{}\n--来自腾讯较真平台'.format(
-			title, data_dict["result"], _cut_abstract(data_dict["abstract"]), data_dict['oriurl'])
-		logger.info("Replied: {}".format(reply_text))
-		return True, reply_text
+		try:
+			# TODO 这里为啥会报错： TypeError: the JSON object must be str, bytes or bytearray, not dict
+			data_dict = json.loads(res_verify_news["reason"])["_source"]
+		except:
+			print(res_verify_news)
+		else:
+			reply_text = '注意：这个『{}』可能是『{}』，这里有详细的报道：{}\n更多可以了解：{}\n--来自腾讯较真平台'.format(
+				title, data_dict["result"], _cut_abstract(data_dict["abstract"]), data_dict['oriurl'])
+			logger.info("Replied: {}".format(reply_text))
+			return True, reply_text
 	else:
 		logger.debug("Muted: {}".format(res_verify_news))
 		return False, res_verify_news["reason"]

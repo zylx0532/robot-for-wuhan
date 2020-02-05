@@ -168,13 +168,3 @@ def fetch_area_disease(country, province, city, county):
 			"code": -2,
 			"msg": "抱歉啊，你输入的省份[{}]没有找到哦！".format(province)
 		}
-
-
-
-
-
-
-
-if __name__ == '__main__':
-	init_area_dict()
-

@@ -12,7 +12,7 @@ PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 TEMP_DIR   = os.path.join(PROJECT_DIR, "temp")
 DATA_DIR   = os.path.join(PROJECT_DIR, "data")
-LOG_DIR    = os.path.join(PROJECT_DIR, "log")
+LOG_DIR    = os.path.join(PROJECT_DIR, "logs")
 DATASET_DIR = os.path.join(PROJECT_DIR, "dataset")
 
 WX_ROBOT_DIR    = os.path.join(PROJECT_DIR, "wx_robot")

@@ -4,91 +4,107 @@
 # @Author       : Mark Shawn
 # @Email        : shawninjuly@gmai.com
 # ------------------------------------
+
+
 from wx_robot.utils import *
-from wx_servers.check_disease import init_area_dict, check_area_info
+from wx_servers.verify_news import handle_msg
+from wx_servers.check_disease_2 import check_disease_by_area
+from database.db import my_db
 
 import re
 
+"""
+装饰器部分，你可以用它来收集各类信息
+"""
 
+def msg_record(func):
+	def decorator(self: Bot, msg: Message, *args, **kwargs):
+		result = func(self, msg, *args, **kwargs)
+		item = {
+			"func_name"     : func.__name__,
+			"user_name"     : real_sender(msg).name,
+			"group_name"    : msg.sender.name if msg.member else None,
+			"msg_raw"       : msg.raw,
+		}
+		if result:  # 只在确实进入管道的时候才加
+			my_db.insert_one(item)
+		return result
+	return decorator
+
+
+"""
+功能函数部分，你可以设计各种不同的功能
+"""
+
+@msg_record
+def command_quit(self, msg):
+	if msg.sender == self.self and msg.text == "退出":
+		self.my_log.info("收到退出命令，正在下线，bye bye ~")
+		self.logout()
+		return True
+
+@msg_record
+def command_enable_some_func(self, msg):
+	command_open = re.match("打开(.*)", msg.text)
+	if command_open:
+		command = command_open.group(1).strip()
+		if command in self.commands_dict:
+			setattr(self, self.commands_dict[command], True)
+			return "已{} {} by {}".format(self.ENABLE_COMMAND_PREFIX, command, real_sender(msg))
+
+@msg_record
+def command_disable_some_func(self, msg):
+	command_close = re.match("关闭(.*)", msg.text)
+	if command_close:
+		command = command_close.group(1).strip()
+		if command in self.commands_dict:
+			setattr(self, self.commands_dict[command], False)
+			return "已{} {} by {}".format(self.DISABLE_COMMAND_PREFIX, command, real_sender(msg))
+
+@msg_record
+def command_verify_shared_msg(self, msg):
+	if msg.type == "Sharing":
+		# TODO 以下逻辑还没有完全和 utils中解耦，后续再优化
+		msg_status, msg_info = handle_msg(msg)
+		if msg_status:
+			self.my_log.info(msg_info)
+			return msg_info
+		else:
+			self.verified_msgs_dict.update({msg_info["id"]: msg_info})
+			if WX_VERIFY_DEBUG:
+				return msg_info
+
+@msg_record
+def command_check_disease(self, msg):
+	area_match = re.match("查(?:一查|查|询)?\s*([\u4e00-\u9fa5]*)", msg.text)
+	if area_match:
+		area_matched = area_match.group(1)
+		if area_matched:
+			area_info = check_disease_by_area(area_matched)
+			if area_info["code"] != 0:
+				# 如果返回不为0，则返回报错消息
+				self.my_log.error(area_info)
+				return "哎呀，服务器好像出错了，IT小哥正在赶在路上啦，我去催催他/她/它快来救我！"
+			# 如果返回码为0，则顺利返回消息
+			return area_info["msg"]
+		# 如果没有匹配到任何信息，就给一个提示
+		return "您要查啥呢？不如试试查一些城市的疫情数据？比如 『查武汉』=.="
+	# 没有匹配，则不返回任何信息，且不阻塞消息管道
+
+
+
+"""
+全局控制逻辑，最好不要修改，除非你知道你在做什么！
+"""
 def start_servers(self):
-	"""
 
-	:param self:
-	:return:
-	"""
+	monitor_chats = self.target_groups + [self.my_fh]
 
-
-	"""
-	以下是全部控制命令
-	"""
-	self.commands_dict = {
-		"辟谣": "enable_verify_news",
-		"疫情": "enable_check_disease",
-	}
-	self.ENABLE_COMMAND_PREFIX = "打开"
-	self.DISABLE_COMMAND_PREFIX = "关闭"
-
-
-	@self.register(chats=self.target_groups + [self.my_fh], msg_types=[TEXT, SHARING], except_self=False)
+	@self.register(chats=monitor_chats, msg_types=[TEXT, SHARING], except_self=False)
 	def func_control(msg: Message):
-		if msg.text == "帮助":
-			return ABOUT_ME.format(
-				"目前可选功能有: {}\n启动命令为： {}\n关闭命令为： {}".format(
-					list(self.commands_dict),
-					self.ENABLE_COMMAND_PREFIX,
-					self.DISABLE_COMMAND_PREFIX,
-			))
 
-		command_open = re.match("打开(.*)", msg.text)
-		if command_open:
-			command = command_open.group(1).strip()
-			if command in self.commands_dict:
-				setattr(self, self.commands_dict[command], True)
-				return "已{} {} by {}".format(self.ENABLE_COMMAND_PREFIX, command, real_sender(msg))
-
-		command_close = re.match("关闭(.*)", msg.text)
-		if command_close:
-			command = command_close.group(1).strip()
-			if command in self.commands_dict:
-				setattr(self, self.commands_dict[command], False)
-				return "已{} {} by {}".format(self.DISABLE_COMMAND_PREFIX, command, real_sender(msg))
-
-
-		"""
-		辟谣
-		"""
-		if self.enable_verify_news:
-			if msg.type == "Sharing":
-				# TODO 以下逻辑还没有完全和 utils中解耦，后续再优化
-				msg_status, msg_info = handle_msg(msg)
-				if msg_status:
-					self.my_log.info(msg_info)
-					return msg_info
-				else:
-					self.verified_msgs_dict.update({msg_info["id"]: msg_info})
-					if WX_VERIFY_DEBUG:
-						return msg_info
-
-			chase_msg_match = re.match("追\s*(\d+)", msg.text)
-			if chase_msg_match:
-				msg_id = chase_msg_match.group(1)
-				msg_info = self.verified_msgs_dict.get(msg_id, None)
-				return "@{} 答: {}".format(real_sender(msg), msg_info)
-
-		"""
-		疫情数据查询
-		"""
-		if self.enable_check_disease:
-			# 匹配查字后面连续的字符串
-			area_match = re.match("查(.*)", msg.text)
-			if area_match:
-				area_matched = area_match.group(1)
-				# 特例
-				if area_matched == "全国":
-					area_matched = "中国"
-				if area_matched:
-					area_info = check_area_info(area_matched)
-					return area_info["msg"]
-				else:
-					return "您要查啥呢？不如试试查一些城市的疫情数据？比如 『查武汉』"
+		for command in REGISTER_COMMANDS:
+			res = eval(command)(self, msg)
+			if res:
+				return res
 

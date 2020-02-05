@@ -9,7 +9,6 @@ from wx_robot.connect_servers import start_servers
 
 from wxpy import *
 
-
 class MyBot(Bot):
 
 	def __init__(self, *args, **kwargs):
@@ -18,42 +17,55 @@ class MyBot(Bot):
 			qr_path=WX_QR_PATH,
 			logout_callback=self.log_out_callback
 		)
+		# 将log发送给自己的文件助手
+		self.my_fh                  = self.file_helper
+		self.my_log                 = get_wechat_logger(self, level=logging.DEBUG, name="WXPY")
 
 		# 添加PUID路径，用于追溯用户ID的唯一标识
 		self.enable_puid(WX_PUID_PATH)
+		self.target_group_keys      = WX_TARGET_GROUP_KEYS
+		self.target_groups          = []
 
-		# 将log发送给自己的文件助手
-		self.my_log = get_wechat_logger(receiver=self, level=WX_LOG_LEVEL, name="WXPY")
-		self.my_fh = self.file_helper       # 自己的文件传输助手
-		self.target_groups = []             # 要监控的群组
 
-		self.verified_msgs_dict = dict()    # TODO 设置一个固定长的字典队列
+		self.verified_msgs_dict     = dict()    # TODO 设置一个固定长的字典队列
 
 		self.start_servers          = start_servers
 		self.enable_verify_news     = ENABLE_VERIFY_NEWS        # 辟谣
 		self.enable_check_disease   = ENABLE_CHECK_DISEASE      # 疫情数据
 		self.enable_check_transport = ENABLE_CHECK_TRANSPORT    # 出行人数据
 
+		self.send_greetings         = SEND_GREETING
+		self.born_time              = time.time()
+
+
 	def run(self):
 		self.my_log.info("Welcome to use Robot-For-Wuhan ~")
+		# self.born_time = time.time() - 60 * 60
+		# self.send_greetings = True
 		self.load_groups_to_monitor()
 		self.start_servers(self)
 		embed()
 
 
 	def load_groups_to_monitor(self):
-		for search_key in WX_VERIFY_GROUP_KEYS:
+		for search_key in self.target_group_keys:
 			try:
-				searched_group = ensure_one(self.groups().search(search_key))   # type: Group
+				searched_group = ensure_one(self.groups().search(search_key))  # type: Group
 			except:
-				self.my_log.error("No group found with key {}".format(search_key))
+				self.my_log.error("Failed to load group with key {}".format(search_key))
 			else:
 				self.target_groups.append(searched_group)
-				self.my_log.info("Successfully added group {} with key {}".format(searched_group.name, search_key))
+				self.my_log.info("Loaded group {} ~".format(searched_group.name, search_key))
 
-				if SEND_GREETING:
+				if self.send_greetings:
 					searched_group.send("大家好，我是武汉疫情机器人，特为您提供[查XX]命令查询地区疫情，如需帮助请回复帮助，新年快乐~")
 
+	def log_out(self):
+		self.lifetime = (time.time() - self.born_time) / 60
+		if self.send_greetings:
+			for target_group in self.target_groups:
+				target_group.send("收到！我这就下线，感谢有大家陪伴的{:.2f}分钟，我们下次再见~".format(self.lifetime))
+		self.logout()
 
 	def log_out_callback(self):
 		self.my_log.info("注意：您的机器人已下线！")
