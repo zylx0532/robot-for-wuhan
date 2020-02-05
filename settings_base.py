@@ -12,14 +12,14 @@ import logging
 修改以下代码，尤其是要监控的群组
 """
 SEND_GREETING           = False
-ENABLE_VERIFY_NEWS      = True          # 辟谣开关
-ENABLE_CHECK_TRANSPORT  = True          # TODO 出行人开关
-ENABLE_CHECK_DISEASE    = True          # 疫情数据开关
+ENABLE_VERIFY_NEWS      = True              # 辟谣开关
+ENABLE_CHECK_TRANSPORT  = True              # TODO 出行人开关
+ENABLE_CHECK_DISEASE    = True              # 疫情数据开关
 
 
-WX_LOG_LEVEL = logging.DEBUG            # 默认log会发送给自己的文件助手，这里可以设置log的等级
-WX_VERIFY_DEBUG = True                  # 是否打开辟谣的debug，打开之后将对每一条链接都返回消息结果
-WX_TARGET_GROUP_KEYS = [                # 辟谣所监控的消息群，直接输入关键字即可，一定要确保唯一，否则会报错
+WX_LOG_LEVEL            = logging.DEBUG     # 默认log会发送给自己的文件助手，这里可以设置log的等级
+WX_VERIFY_DEBUG         = True              # 是否打开辟谣的debug，打开之后将对每一条链接都返回消息结果
+WX_TARGET_GROUP_KEYS    = [                 # 辟谣所监控的消息群，直接输入关键字即可，一定要确保唯一，否则会报错
 	"测试群",
 	"XBRL",
 	"机器人团队",

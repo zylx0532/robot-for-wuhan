@@ -9,29 +9,6 @@ import time
 
 
 """
-路径配置
-"""
-DATA_AREA_DICT_NAME = "area_dict.json"
-DATA_COUNTRY_DICT_NAME = "country_dict.json"
-
-DATA_PROVINCE_LIST_NAME = "province.json"
-DATA_CITY_DICT_NAME = "city.json"
-DATA_COUNTY_DICT_NAME = "county.json"
-
-
-DATASET_AREA_DIR = os.path.join(DATASET_DIR, "area")
-DATASET_PROVINCE_LIST_PATH  = os.path.join(DATASET_AREA_DIR, DATA_PROVINCE_LIST_NAME)
-DATASET_CITY_LIST_PATH      = os.path.join(DATASET_AREA_DIR, DATA_CITY_DICT_NAME)
-DATASET_COUNTY_LIST_PATH    = os.path.join(DATASET_AREA_DIR, DATA_COUNTY_DICT_NAME)
-
-WX_SERVER_DATA_DIR      = os.path.join(WX_SERVERS_DIR, "data")
-DATA_AREA_DICT_PATH  = os.path.join(WX_SERVER_DATA_DIR, DATA_AREA_DICT_NAME)
-DATA_COUNTRY_DICT_PATH = os.path.join(WX_SERVER_DATA_DIR, DATA_COUNTRY_DICT_NAME)
-
-
-
-
-"""
 疫情查询
 """
 

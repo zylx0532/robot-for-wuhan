@@ -23,7 +23,7 @@ SPECIAL_AREA_CASES = {
 }
 
 
-def _gen_area_dict_from_area_tree(area_tree: list, cur_area_dict: dict=dict(), cur_area_chain: str="") -> dict:
+def _gen_area_dict_from_area_tree(area_tree: list, cur_area_dict: dict=dict(), cur_area_chain: str="", depth=1) -> dict:
 	"""
 	该函数用于将腾讯的地区数据列表转为重新结构化的地区数据字典，以实现多种用途
 	:param area_tree:
@@ -41,9 +41,10 @@ def _gen_area_dict_from_area_tree(area_tree: list, cur_area_dict: dict=dict(), c
 			"total": area_info["total"],
 			"today": area_info["today"],
 			"name_chain": area_chain,
+			"depth": depth + 1,
 		}
 		if area_info.get("children"):
-			_gen_area_dict_from_area_tree(area_info["children"], cur_area_dict, area_chain)
+			_gen_area_dict_from_area_tree(area_info["children"], cur_area_dict, area_chain, depth+1)
 	return cur_area_dict
 
 
@@ -71,6 +72,10 @@ def fetch_disease_data() :
 		data = json.loads(data["data"])
 		area_tree = data["areaTree"]
 		global_area_dict = _gen_area_dict_from_area_tree(area_tree)
+
+		# 进行层级排序
+		global_area_dict = dict(sorted(global_area_dict.items(), key=lambda x: x[1]["b"]))
+
 		return {
 			"code": 0,
 			"msg": "SUCCESS! 成功生成地区字典 ~"
