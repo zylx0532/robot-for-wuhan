@@ -58,9 +58,13 @@ class MyBot(Bot):
 				self.my_log.info("Loaded group {} ~".format(searched_group.name, search_key))
 
 				if self.send_greetings:
-					searched_group.send("大家好，我是武汉疫情机器人，特为您提供[查XX]命令查询地区疫情，如需帮助请回复帮助，新年快乐~")
+					searched_group.send(TEMPLATE_LOG_IN_GREETING)
 
 	def log_out(self):
+		"""
+		这个函数是我们手动设置的登出命令，系统默认的登出命令是self.logout()
+		:return:
+		"""
 		self.lifetime = (time.time() - self.born_time) / 60
 		if self.send_greetings:
 			for target_group in self.target_groups:
@@ -68,7 +72,12 @@ class MyBot(Bot):
 		self.logout()
 
 	def log_out_callback(self):
-		self.my_log.info("注意：您的机器人已下线！")
+		"""
+		这个函数是在机器人登出后才会运行的
+		由于登出后无法再向自己的文件助手发送消息，因此就不做扩展了
+		:return:
+		"""
+		pass
 
 
 if __name__ == '__main__':

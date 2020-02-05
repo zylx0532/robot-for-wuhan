@@ -40,7 +40,7 @@ def msg_record(func):
 @msg_record
 def command_quit(self, msg):
 	if msg.sender == self.self and msg.text == "退出":
-		self.my_log.info(TEMPLATE_ROBOT_QUIT)
+		self.my_log.info(TEMPLATE_LOG_OUT_GREETING)
 		self.logout()
 		return True
 

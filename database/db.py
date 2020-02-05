@@ -29,14 +29,12 @@ class MyFileWriter():
 	def __init__(self, file_path=None):
 		self.file_path = file_path if file_path else MSG_HISTORY_PATH
 		self.file_writer = open(self.file_path, "a", encoding="utf-8")
-		self.file_writer.write("[")
 
 	def insert_one(self, item: dict):
 		self.file_writer.write("{}\n".format(item))
 
-	def __del__(self):
+	def __exit__(self, exc_type, exc_val, exc_tb):
 		self.file_writer.close()
-		print("Successfully saved file to {}".format(self.file_path))
 		return True
 
 
