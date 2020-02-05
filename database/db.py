@@ -25,18 +25,19 @@ class MyMongoDB():
 		self.uri.close()
 
 class MyFileWriter():
-
-	def __init__(self):
-		self.file_writer = open(MSG_HISTORY_PATH, "a", encoding="utf-8")
+	import atexit
+	def __init__(self, file_path=None):
+		self.file_path = file_path if file_path else MSG_HISTORY_PATH
+		self.file_writer = open(self.file_path, "a", encoding="utf-8")
 		self.file_writer.write("[")
 
 	def insert_one(self, item: dict):
-		item.pop("msg_raw")             # 减少本地存储信息量
 		self.file_writer.write("{}\n".format(item))
 
 	def __del__(self):
-		self.file_writer.write("]")
 		self.file_writer.close()
+		print("Successfully saved file to {}".format(self.file_path))
+		return True
 
 
 if USE_MONGODB:

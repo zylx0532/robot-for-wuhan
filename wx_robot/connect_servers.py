@@ -12,6 +12,7 @@ from wx_servers.check_disease_2 import check_disease_by_area
 from database.db import my_db
 
 import re
+import random
 
 """
 装饰器部分，你可以用它来收集各类信息
@@ -39,7 +40,7 @@ def msg_record(func):
 @msg_record
 def command_quit(self, msg):
 	if msg.sender == self.self and msg.text == "退出":
-		self.my_log.info("收到退出命令，正在下线，bye bye ~")
+		self.my_log.info(TEMPLATE_ROBOT_QUIT)
 		self.logout()
 		return True
 
@@ -84,11 +85,11 @@ def command_check_disease(self, msg):
 			if area_info["code"] != 0:
 				# 如果返回不为0，则返回报错消息
 				self.my_log.error(area_info)
-				return "哎呀，服务器好像出错了，IT小哥正在赶在路上啦，我去催催他/她/它快来救我！"
+				return TEMPLATE_API_FAILED
 			# 如果返回码为0，则顺利返回消息
-			return area_info["msg"]
+			return area_info["msg"] + random.choice(TEMPLATE_RANDOM_MSG_TAIL_LIST)
 		# 如果没有匹配到任何信息，就给一个提示
-		return "您要查啥呢？不如试试查一些城市的疫情数据？比如 『查武汉』=.="
+		return TEMPLATE_NO_KEYWORD
 	# 没有匹配，则不返回任何信息，且不阻塞消息管道
 
 

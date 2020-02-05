@@ -34,6 +34,13 @@ DATA_COUNTRY_DICT_PATH = os.path.join(WX_SERVER_DATA_DIR, DATA_COUNTRY_DICT_NAME
 """
 疫情查询
 """
+
+TEMPLATE_NOT_FOUND_AREA_RESULT  = "咦？没有找到{}的数据哦，说不定还没被感染呢，哈哈那也太幸运了！"
+TEMPLATE_SEVERAL_AREAS_RESULT   = "您要查询的『{}』有多个结果哦，我就给您一并返回啦：\n"
+TEMPLATE_MULTI_AREAS_RESULT     = "哎呀，『{}』咋这么热乎，有这么多结果，我都快分不清了，你看:\n"
+
+TEMPLATE_API_SERVICE_CLOSED     = "查询服务已被关闭，请检查后台系统！"
+
 MAX_AREA_RESULTS            = 3
 AREA_DICT_TIMEOUT           = 600
 server_enable_check_disease = True
@@ -42,6 +49,7 @@ global_updated_time         = time.time()
 
 API_TX_DISEASE_DATA = "https://view.inews.qq.com/g2/getOnsInfo?name=disease_h5"
 API_TX_DISEASE_NEWS = "https://view.inews.qq.com/g2/getOnsInfo?name=wuwei_ww_time_line" # TODO 疫情新闻的推送
+
 
 
 """
