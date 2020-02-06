@@ -70,6 +70,7 @@ class MyBot(Bot):
 			for target_group in self.target_groups:
 				target_group.send("收到！我这就下线，感谢有大家陪伴的{:.2f}分钟，我们下次再见~".format(self.lifetime))
 		self.logout()
+		sys.exit(0)
 
 	def log_out_callback(self):
 		"""

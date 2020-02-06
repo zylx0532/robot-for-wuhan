@@ -48,6 +48,7 @@ def msg_tail(func):
 	def wrapper(self, msg):
 		res = func(self, msg)
 		if isinstance(res, str):
+			res += "\n-----------\n"
 			res += random_tail()
 		return res
 	return wrapper
@@ -96,7 +97,7 @@ def command_verify_shared_msg(self, msg):
 				return msg_info
 
 
-@msg_tail
+# @msg_tail
 @msg_record
 def command_check_disease(self, msg):
 	"""
@@ -108,8 +109,7 @@ def command_check_disease(self, msg):
 	area_match = re.match("查(?:一查|查|询)?\s*([\u4e00-\u9fa5]*)", msg.text)
 	if area_match:
 		area_matched = area_match.group(1)
-		if area_matched:
-			return check_disease_by_area(area_matched)
+		return check_disease_by_area(area_matched)
 
 
 

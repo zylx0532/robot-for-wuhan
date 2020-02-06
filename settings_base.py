@@ -12,11 +12,11 @@ from CONST_base import *
 """
 WX_TARGET_GROUP_KEYS    = [                 # 辟谣所监控的消息群，直接输入关键字即可，一定要确保唯一，否则会报错
 	"测试群",
-	"XBRL",
 	"机器人团队",
 	"健康平安",
 	"P.F.A",
 	"统计建模",
+	# "Networkland",
 ]
 
 

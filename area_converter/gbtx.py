@@ -177,10 +177,6 @@ class GBTX(object):
 		return STATUS.CN_NOT_FOUND, None
 
 	def search_global_area(self, search_key: str) -> [STATUS.status, [None, list]]:
-		# 先遍历感染疫情的目标国家字典
-		country_items = [country_item for country_item in self.global_area_disease if search_key in country_item["name"]]
-		if country_items:
-			return STATUS.GLOBAL_COUNTRY_INFECTED, country_items
 
 		# 否则看看是不是国家
 		is_country, area_name = self.is_a_country(search_key)
@@ -201,6 +197,11 @@ class GBTX(object):
 		###################    预 处 理   ####################
 		search_key = re.sub("[^\u4e00-\u9fa5]*", "", search_key)            # 去除非中文
 		search_key = SPECIAL_CASES.get(search_key, search_key)   # 替换特例
+
+		##################### 先遍历感染疫情的目标国家字典 ##### 解决“中国”bug
+		country_items = [country_item for country_item in self.global_area_disease if search_key in country_item["name"]]
+		if country_items:
+			return STATUS.GLOBAL_COUNTRY_INFECTED, country_items
 
 		##################### 搜国内 #########################
 		k, v = self.search_china_area(search_key)
