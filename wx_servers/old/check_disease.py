@@ -123,7 +123,7 @@ def fetch_area_disease(country, province, city, county):
 			"msg": "GG，腾讯接口不能用了！本接口将暂时关闭，等待主人debug！"
 		}
 
-	data = json.loads(res_json["data"])
+	data = json.loads(res_json["archive"])
 	area_list = data["areaTree"]
 	# 先判断是否是国家
 	if country:

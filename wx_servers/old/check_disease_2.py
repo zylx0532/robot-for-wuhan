@@ -23,6 +23,42 @@ SPECIAL_AREA_CASES = {
 }
 
 
+"""
+疫情查询
+"""
+
+TEMPLATE_NOT_FOUND_AREA_RESULT  = "咦？没有找到{}的数据哦，说不定还没被感染呢，哈哈那也太幸运了！"
+TEMPLATE_SEVERAL_AREAS_RESULT   = "您要查询的『{}』有多个结果哦，我就给您一并返回啦：\n"
+TEMPLATE_MULTI_AREAS_RESULT     = "哎呀，『{}』咋这么热乎，有这么多结果，我都快分不清了，你看:\n"
+
+TEMPLATE_API_SERVICE_CLOSED     = "查询服务已被关闭，请检查后台系统！"
+
+MAX_AREA_RESULTS            = 3
+AREA_DICT_TIMEOUT           = 600
+server_enable_check_disease = True
+global_area_dict            = dict()
+global_updated_time         = time.time()
+
+
+
+def preprocess_area_input(area_input):
+	"""
+	分析用户输入
+	:param area_input:
+	:return:
+	"""
+	# 特例转换
+	area_input = SPECIAL_AREA_CASES.get(area_input, area_input)
+	# 后缀切割
+	# 虽然以下对用户输入先切割再合成的处理，原目标是为了与腾讯的地区字典匹配，但显然这种思想是非常好的
+	area_chain = re.split("|".join(AREA_SPLIT_WORDS_LIST), area_input)
+	area_chain = list(filter(lambda x: x, area_chain))
+	# 保留前三级分割的词语，因为只有国-省-市三个级别；并合成新的句子
+	area_chain = area_chain[:3]
+	area_concat = "".join(area_chain)
+	return area_concat
+
+
 def _gen_area_dict_from_area_tree(area_tree: list, cur_area_dict: dict=dict(), cur_area_chain: str="", depth=1) -> dict:
 	"""
 	该函数用于将腾讯的地区数据列表转为重新结构化的地区数据字典，以实现多种用途
@@ -69,7 +105,7 @@ def fetch_disease_data() :
 				"msg": "ERROR！返回码不为0！已保存log到{}.".format(err_log_path)
 		}
 
-		data = json.loads(data["data"])
+		data = json.loads(data["archive"])
 		area_tree = data["areaTree"]
 		global_area_dict = _gen_area_dict_from_area_tree(area_tree)
 
@@ -114,24 +150,6 @@ def check_global_area_dict():
 			return fetched_result
 	# 正常返回
 	return None
-
-def preprocess_area_input(area_input):
-	"""
-	分析用户输入
-	:param area_input:
-	:return:
-	"""
-	# 特例转换
-	area_input = SPECIAL_AREA_CASES.get(area_input, area_input)
-	# 后缀切割
-	# 虽然以下对用户输入先切割再合成的处理，原目标是为了与腾讯的地区字典匹配，但显然这种思想是非常好的
-	area_chain = re.split("|".join(AREA_SPLIT_WORDS_LIST), area_input)
-	area_chain = list(filter(lambda x: x, area_chain))
-	# 保留前三级分割的词语，因为只有国-省-市三个级别；并合成新的句子
-	area_chain = area_chain[:3]
-	area_concat = "".join(area_chain)
-	return area_concat
-
 
 def check_disease_by_area(area_input):
 

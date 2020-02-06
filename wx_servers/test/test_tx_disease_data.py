@@ -16,7 +16,7 @@ def get_tx_area_tree():
 	res_json = requests.get(API_TX_DISEASE_DATA).json()
 	assert res_json["ret"] == 0
 
-	data = json.loads(res_json["data"])
+	data = json.loads(res_json["archive"])
 	area_tree = data["areaTree"]
 	write_json_file(area_tree, DATA_TX_AREAS_PATH)
 

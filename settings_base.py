@@ -14,21 +14,20 @@ WX_TARGET_GROUP_KEYS    = [                 # 辟谣所监控的消息群，直�
 	"测试群",
 	"XBRL",
 	"机器人团队",
-	"最帅气",
 	"健康平安",
 	"P.F.A",
 	"统计建模",
 ]
 
 
-WX_LOG_LEVEL            = logging.DEBUG     # 默认log会发送给自己的文件助手，这里可以设置log的等级
 
-SEND_GREETING           = False
+SEND_GREETING           = False             # 是否在启动和关闭的时候群发祝福语
 ENABLE_CHECK_DISEASE    = True              # 疫情数据开关
 ENABLE_VERIFY_NEWS      = True              # 辟谣开关
 WX_VERIFY_DEBUG         = True              # 是否打开辟谣的debug，打开之后将对每一条链接都返回消息结果
 ENABLE_CHECK_TRANSPORT  = True              # TODO 出行人开关
 
+WX_LOG_LEVEL            = logging.DEBUG     # 默认log会发送给自己的文件助手，这里可以设置log的等级
 
 
 REGISTER_COMMANDS = [
