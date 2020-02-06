@@ -30,4 +30,5 @@ def check_disease_by_area(search_key):
 		for msg_seq, msg_content in enumerate(msgs):
 			msg_all += "{}. {}\n".format(msg_seq+1, msg_content)
 		return msg_all
-	return status
+	print(msg)
+	return status.msg
